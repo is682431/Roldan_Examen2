@@ -55,7 +55,6 @@ wire ORForBranch;
 wire ALUSrc_wire;
 wire RegWrite_wire;
 wire Zero_wire;
-wire inc_wire; // selector for inc
 wire [2:0] ALUOp_wire;
 wire [3:0] ALUOperation_wire;
 wire [4:0] WriteRegister_wire;
@@ -70,7 +69,6 @@ wire [31:0] ALUResult_wire;
 wire [31:0] PC_4_wire;
 wire [31:0] InmmediateExtendAndShifted_wire;
 wire [31:0] PCtoBranch_wire;
-wire [31:0] a_p1;  //a+1
 integer ALUStatus;
 
 
@@ -83,7 +81,6 @@ Control
 ControlUnit
 (
 	.OP(Instruction_wire[31:26]),
-	.inc(inc_wire),  //control wire for inc
 	.RegDst(RegDst_wire),
 	.BranchNE(BranchNE_wire),
 	.BranchEQ(BranchEQ_wire),
@@ -224,9 +221,6 @@ Register_File
 
 );
 
-
-
-
 SignExtend
 SignExtendForConstants
 (   
@@ -260,39 +254,11 @@ ArithmeticLogicUnitControl
 
 
 
-Adder32bits				//a+1
-A_Plus_1
-(
-	.Data0(PC_wire),
-	.Data1(1),
-	
-	.Result(a_p1)
-);
-
-
-Multiplexer2to1
-#(
-	.NBits(32)
-)
-MUX_Forinc   //inc
-(
-	.Selector(inc_wire),
-	.MUX_Data0(ReadData1_wire),
-	.MUX_Data1(a_p1),
-	
-	.MUX_Output(A_inc)
-
-);
-
-
-
-
-
 ALU
 ArithmeticLogicUnit 
 (
 	.ALUOperation(ALUOperation_wire),
-	.A(A_inc),
+	.A(ReadData1_wire),
 	.B(ReadData2OrInmmediate_wire),
 	.Zero(Zero_wire),
 	.ALUResult(ALUResult_wire)
